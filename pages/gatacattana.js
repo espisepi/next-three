@@ -1,4 +1,4 @@
-import React, { Suspense, useEffect, useRef, useState, useMemo } from 'react';
+import React, { Suspense, useEffect, useRef, useState, useMemo, useCallback } from 'react';
 import { Canvas, useFrame, useLoader, useThree } from 'react-three-fiber';
 import { OrbitControls, StandardEffects, Box } from 'drei';
 import * as THREE from 'three';
@@ -70,18 +70,32 @@ function AssetGltf({ url, speed = 1 }) {
 
 
 const GatacattanaPage = () => {
+
+  const [visible, setVisible] = useState(true);
+  const changeVisible = useCallback(()=>{
+      setVisible(v => !v)
+  },[]);
+
+  // 0: (3rd person)   ,   1: (1st person)
+  const [zoomType, setZoomType] = useState(0);
+  const changeZoom = useCallback(() => {
+      setZoomType(z => !z)
+  });
+  
   return [
     <Canvas camera={{ position: [0, 0, 35] }} style={{position: 'absolute'}}>
       <ambientLight intensity={2} />
       <Background url='assets/musica/gotham.mp4' />
       <Ocean geometry={new THREE.BoxBufferGeometry( 500, 500, 500 )} position={[0,240,0]} />
-      <SimondevPersonController />
+      <SimondevPersonController visible={visible} zoomType={zoomType} />
       <Suspense fallback={null}>
             <AssetGltf url="assets/obj/Horse.glb" />
     </Suspense>
     </Canvas>,
     <Joystick />,
-    <Fullscreen />
+    <Fullscreen />,
+    <div onClick={changeZoom} style={{ position:'absolute', width:'20px', height:'20px', bottom: 40, borderStyle: 'dashed', color: '#e60005', zIndex: 20 }}></div>,
+    <div onClick={changeVisible} style={{ position:'absolute', width:'20px', height:'20px', bottom: 80, borderStyle: 'dashed', color: '#e60005', zIndex: 20 }}></div>
   ]
 }
 
